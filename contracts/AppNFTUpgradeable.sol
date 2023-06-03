@@ -168,7 +168,7 @@ contract AppNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
     function safeMintAppNFT(address to, string memory uri, string calldata appName) external payable whenNotPaused {
 
         if(payForMintFlag){
-            require(msg.value >= mint_fees, "Insufficient fees");
+            require(msg.value >= mint_fees, "Insufficient mint fee");
         }
 
         if(!mintManyFlag){
