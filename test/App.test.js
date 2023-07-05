@@ -152,7 +152,6 @@ describe(".app & .dev NFT minting", function () {
           deployNFTsFixture
         );
 
-        // We use lock.connect() to send a transaction from another account
         await expect(
           devNFT
             .connect(otherAccount)
@@ -222,7 +221,7 @@ describe(".app & .dev NFT minting", function () {
           appName,
           appNameLower
         );
-        // We use lock.connect() to send a transaction from another account
+
         await expect(
           devNFT
             .connect(otherAccount)
@@ -252,7 +251,6 @@ describe(".app & .dev NFT minting", function () {
         const { appNFT, otherAccount, appName, appNameLower, app_uri } =
           await loadFixture(deployNFTsFixture);
 
-        // We use lock.connect() to send a transaction from another account
         await expect(
           appNFT
             .connect(otherAccount)
@@ -390,7 +388,7 @@ describe(".app & .dev NFT minting", function () {
         devNFT
           .connect(otherAccount)
           .safeMintDevNFT(otherAccount.address, devName.otherAccount);
-        // We use lock.connect() to send a transaction from another account
+
         await expect(
           appNFT
             .connect(otherAccount)
