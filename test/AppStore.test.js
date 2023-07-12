@@ -28,6 +28,11 @@ describe(".appStore minting", function () {
     const dappNameList = await DappNameList.deploy();
     await dappNameList.deployed();
     await dappNameList.setDappNames(specialdAppNames);
+    const DevNFT = await ethers.getContractFactory("DevNFTUpgradeable");
+    const devNFT = await upgrades.deployProxy(DevNFT, [
+      process.env.TRUSTED_FORWARDER_ADDRESS,
+    ]);
+    await devNFT.deployed();
 
 
     const appStoreName = {
@@ -46,6 +51,7 @@ describe(".appStore minting", function () {
 
     const AppStoreNFT = await ethers.getContractFactory("AppStoreNFTUpgradeable");
     const appStoreNFT = await upgrades.deployProxy(AppStoreNFT, [
+      devNFT.address,
       dappNameList.address,
       process.env.TRUSTED_FORWARDER_ADDRESS,
     ]);
@@ -150,7 +156,7 @@ describe(".appStore minting", function () {
           appStoreNFT
             .connect(account1)
             .safeMintAppStoreNFT(account1.address, appStore_uri, appStoreName.account1)
-        ).to.be.revertedWith("provided wallet already used to create app");
+        ).to.be.revertedWith("provided wallet already used to create appStore");
       });
 
       it("Shouldn't fail safeMintAppStoreNFT call if more than 1 appName is minted by same user when mintManyFlag is turned true by owner", async function () {
