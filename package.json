@@ -1,7 +1,7 @@
 {
   "name": "meroku-contracts",
   "version": "1.0.0",
-  "description": "Includes contracts for .app and .dev NFTs",
+  "description": "Includes contracts for .app, .dev & .appStore NFTs",
   "private": true,
   "main": "index.js",
   "scripts": {
