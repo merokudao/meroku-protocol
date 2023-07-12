@@ -3851,6 +3851,9 @@
     "uniblow.app",
     "unido.app",
     "unocoin.app",
-    "web-bifrost-bridge.app"
+    "web-bifrost-bridge.app",
+    "brave-browser.app",
+    "etherscan-explorer.app",
+    "phantom-wallet.app"
   ]
 }
