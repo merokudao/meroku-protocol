@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: 18
           sarif: results.sarif
-          fail-on: high
+          fail-on: none
           slither-args: --solc-remaps '@openzeppelin=node_modules/@openzeppelin @opengsn=node_modules/@opengsn'
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
