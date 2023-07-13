@@ -38,35 +38,36 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
 
     uint128 public trading_fees;  // fees percentage in Gwei ex 2Gwei = 2%
     uint128 public renew_fees;    // fees in wei
-    uint128 public renew_life;    // timeperiod for which the app name can be renewed by current owner
-    uint128 public token_life;    // timeperiod for which the app name is valid
+    uint128 public renew_life;    // timeperiod for which the appStore name can be renewed by current owner
+    uint128 public token_life;    // timeperiod for which the appStore name is valid
 
 
-    // flag to prevent specific app name length
+    // flag to prevent specific appStore name length
     bool public mintSpecialFlag;
-    // flag to prevent minting multiple app names from one account
+    // flag to prevent minting multiple appStore names from one account
     bool public mintManyFlag;
-    // flag to prevent minting app names from the whitelisted apps
+    // flag to prevent minting appStore names from the whitelisted appStores
+
     bool public checkDappNamesListFlag;
     // (Max)Length of special names
     uint128 public constant SPL_MAX_LENGTH = 3;
 
-    // mapping for storing price of .app NFTs when on sale
+    // mapping for storing price of .appStore NFTs when on sale
     mapping(uint256 => uint256) public priceOf;
-    // mapping for storing onSale status of .app NFTs
+    // mapping for storing onSale status of .appStore NFTs
     mapping(uint256 => bool) public onSale;
-    // mapping for storing expiry timstamp of .app NFTs
+    // mapping for storing expiry timstamp of .appStore NFTs
     mapping(uint256 => uint256) public expireOn;
 
-
+    IERC721Upgradeable public devNFTAddress;
     IDappNameList public dappNameListAddress;
 
     //string variable for storing the schema URI
     string public schemaURI;
 
 
-    // upgrades
-    uint128 public mint_fees;    // fees to mint a new app name in wei
+    uint128 public mint_fees;    // fees to mint a new appStore name in wei
+
     // flag to check if the minting is paid or not
     bool public payForMintFlag;
 
@@ -74,7 +75,8 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
     constructor() {
         _disableInitializers();
     }
-    function initialize(address dappNameListAddress_, address trustedForwarder_) initializer public {
+
+    function initialize(address devNFTAddress_, address dappNameListAddress_, address trustedForwarder_) initializer public {
         __ERC721_init("MerokuAppStore", "MerokuAppStore");
         __ERC721Enumerable_init();
         __ERC721URIStorage_init();
@@ -88,7 +90,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
         renew_fees = 20000000000000000; //in wei
         token_life = 365 days;
         renew_life = 30 days;
-
+        devNFTAddress = IERC721Upgradeable(devNFTAddress_);
         dappNameListAddress = IDappNameList(dappNameListAddress_);
         _setTrustedForwarder(trustedForwarder_);
         checkDappNamesListFlag=true;
@@ -146,14 +148,14 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
      * @param appStoreName the name of appStore to set for the token
      */
     function safeMint(address to, string memory uri, string calldata appStoreName) external onlyOwner {
-        require(balanceOf(to)==0, "provided wallet already used to create app");
+        require(balanceOf(to)==0, "provided wallet already used to create appStore");
         string memory validatedAppStoreName = _validateName(appStoreName);
         mint(to, uri, validatedAppStoreName);
     }
 
     /**
      * @notice mints new .appStore NFT
-     * @dev checks validations for app name and emit AppStoreNameSet event on successful minting
+     * @dev checks validations for appStore name and emit AppStoreNameSet event on successful minting
      * @param to the address to mint the token to
      * @param uri the uri to set for the token
      * @param appStoreName the name of appStore to set for the token
@@ -165,7 +167,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
         }
 
         if(!mintManyFlag){
-            require(balanceOf(to)==0, "provided wallet already used to create app");
+            require(balanceOf(to)==0, "provided wallet already used to create appStore");
         }
 
         string memory validatedAppStoreName = _validateName(appStoreName);
@@ -257,6 +259,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
         mintSpecialFlag = _mintSpecialFlag;
     }
 
+
     /**
      * @notice toggles the mintManyFlag by onlyOwner
      * @dev this flag is used to check if the caller is allowed to mint many appStores under a single wallet accoount
@@ -268,7 +271,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
 
     /**
      * @notice toggles checkDappNamesListFlag by onlyOwner
-     * @dev this flag is used to check if the app name is available in the dappNameList contract
+     * @dev this flag is used to check if the appStore name is available in the dappNameList contract
      * @param _checkDappNamesListFlag bool value to set the flag
      */
     function setCheckDappNamesListFlag(bool _checkDappNamesListFlag) external onlyOwner {
@@ -325,16 +328,6 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
         emit UpdatedTokenURI(_tokenID, _tokenURI);
     }
 
-
-    /**
-     * @notice returns the data URI (metadata) for the given token ID
-     * @dev adds /data.json to the token URI to get the schema URI
-     * @param _tokenId the token ID to get the data URI for
-     * @return string the data URI
-     */
-    function getDataURI(uint256 _tokenId) external view returns (string memory) {
-        return string(abi.encodePacked(tokenURI(_tokenId), "/data.json"));
-    }
 
     /**
      * @notice returns the schema URI for the given token ID
@@ -412,7 +405,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
         override(ERC721Upgradeable, ERC721URIStorageUpgradeable)
         returns (string memory)
     {
-        return string(abi.encodePacked(super.tokenURI(tokenId), "/data.json"));
+        return super.tokenURI(tokenId);
     }
 
     function supportsInterface(bytes4 interfaceId)
