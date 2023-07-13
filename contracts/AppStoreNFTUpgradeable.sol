@@ -47,6 +47,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
     // flag to prevent minting multiple appStore names from one account
     bool public mintManyFlag;
     // flag to prevent minting appStore names from the whitelisted appStores
+
     bool public checkDappNamesListFlag;
     // (Max)Length of special names
     uint128 public constant SPL_MAX_LENGTH = 3;
@@ -66,6 +67,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
 
 
     uint128 public mint_fees;    // fees to mint a new appStore name in wei
+
     // flag to check if the minting is paid or not
     bool public payForMintFlag;
 
@@ -73,6 +75,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
     constructor() {
         _disableInitializers();
     }
+
     function initialize(address devNFTAddress_, address dappNameListAddress_, address trustedForwarder_) initializer public {
         __ERC721_init("MerokuAppStore", "MerokuAppStore");
         __ERC721Enumerable_init();
@@ -255,6 +258,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
     function setMintSpecialFlag(bool _mintSpecialFlag) external onlyOwner {
         mintSpecialFlag = _mintSpecialFlag;
     }
+
 
     /**
      * @notice toggles the mintManyFlag by onlyOwner
