@@ -32,6 +32,15 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
     event DevNameSet(address indexed owner, uint256 indexed tokenId, string devName, string uri);
     event UpdatedTokenURI(uint256 indexed tokenId, string uri);
 
+    uint128 public trading_fees;  // fees percentage in Gwei ex 2Gwei = 2%
+    uint128 public renew_fees;    // fees in wei
+    uint128 public renew_life;    // timeperiod for which the dev name can be renewed by current owner
+    uint128 public token_life;    // timeperiod for which the dev name is valid
+
+
+
+    // mapping for storing expiry timstamp of .dev NFTs
+    mapping(uint256 => uint256) public expireOn;
 
     //string variable for storing the schema URI
     string public schemaURI;
@@ -51,8 +60,26 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
         __UUPSUpgradeable_init();
         __ERC721NameStorage_init(".dev");
 
+        trading_fees = 2000000000; //2Gwei = 2%;
+        renew_fees = 20000000000000000; //in wei
+        token_life = 365 days;
+        renew_life = 30 days;
         _setTrustedForwarder(trustedForwarder_);
         _tokenIdCounter.increment();
+    }
+    /**
+     * @dev Throws if token expired
+     */
+    modifier whenNotExpired(uint256 _tokenId) {
+        _checkExpiry(_tokenId);
+        _;
+    }
+
+    /**
+     * @dev Throws if the current timestamp is more than expiry timestamp
+     */
+    function _checkExpiry(uint256 _tokenId) internal view virtual {
+        require(expireOn[_tokenId] > block.timestamp, "Cant continue, Name Token Expired");
     }
 
     /**
@@ -71,12 +98,13 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
         _unpause();
     }
 
-    function mint(address to, string memory uri, string memory validatedDevName) private {
+    function mint(address to, string memory uri, string memory validatedDevName) internal {
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
         _setTokensName(tokenId, validatedDevName);
+        expireOn[tokenId] = block.timestamp + token_life;
         emit DevNameSet(to, tokenId, validatedDevName, uri);
     }
 
@@ -88,7 +116,7 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
      * @param devName the name of dev to set for the token
      */
     function safeMint(address to, string memory uri, string calldata devName) external onlyOwner {
-        require(balanceOf(to)==0, "provided wallet already used to create app");
+        require(balanceOf(to)==0, "provided wallet already used to create dev");
         string memory validatedDevName = _validateName(devName);
         mint(to, uri, validatedDevName);
     }
@@ -97,12 +125,48 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
      * @notice mints new .dev NFT
      * @dev checks validations for dev name and emits DevNameSet event on successful mint
      * @param to the address to mint the token to
+     * @param uri the uri to set for the token
      * @param devName the name of dev to set for the token
      */
-    function safeMintDevNFT(address to, string calldata devName) external whenNotPaused {
-        require(balanceOf(to)==0, "provided wallet already used to create app");
+    function safeMintDevNFT(address to, string memory uri, string calldata devName) external whenNotPaused {
+        require(balanceOf(to)==0, "provided wallet already used to create dev");
         string memory validatedDevName = _validateName(devName);
-        mint(to, "", validatedDevName);
+        mint(to, uri, validatedDevName);
+    }
+
+        /**
+     * @notice renews a .dev NFT if its expired
+     * @dev checks if tokenID is expired and renews it for 1 year if renew_fees is paid
+     * @param _tokenID the tokenId of the NFT to renew
+     */
+    function renewToken(uint256 _tokenID) external payable whenNotPaused {
+        require(_exists(_tokenID), "Token does not exist");
+        require(_msgSender() == _ownerOf(_tokenID), "Not the owner of this tokenId");
+        require(expireOn[_tokenID] < block.timestamp, "Token is not expired yet");
+        require(msg.value >= renew_fees, "Insufficient renew fees");
+        expireOn[_tokenID] = block.timestamp + token_life;
+    }
+
+    /**
+     * @notice to claim the .dev NFT by new user if its expired
+     * @dev checks if tokenID is expired & renew_period is also passed and new user can claim it if renew_fees is paid
+     * @param _tokenID the tokenId of the NFT to claim
+     */
+    function claimToken(uint256 _tokenID) external payable whenNotPaused {
+        require(_exists(_tokenID), "Token does not exist");
+        require(expireOn[_tokenID] + renew_life < block.timestamp, "Token not available for claiming yet");
+        require(msg.value >= renew_fees, "Insufficient renew fees");
+        expireOn[_tokenID] = block.timestamp + token_life;
+        _safeTransfer(_ownerOf(_tokenID), _msgSender(), _tokenID, "");
+    }
+
+    /**
+     * @notice set platform renew_fees for the sale of .dev NFT
+     * @dev this is the fees taken to renew the expired .dev NFT
+     * @param _new_renew_fees uint128 value which is fees in percentage (add 10^9)
+     */
+    function setRenewFees(uint128 _new_renew_fees) external onlyOwner {
+        renew_fees = _new_renew_fees;
     }
 
     /**
@@ -114,6 +178,7 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
     function updateTokenURI(uint256 _tokenId, string memory _tokenURI) external {
         require(_isApprovedOrOwner(_msgSender(), _tokenId), "ERC721: caller is not owner nor approved");
         _setTokenURI(_tokenId, _tokenURI);
+        emit MetadataUpdate(_tokenId);
         emit UpdatedTokenURI(_tokenId, _tokenURI);
     }
 
@@ -203,4 +268,6 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
     {
         return super.supportsInterface(interfaceId);
     }
+
+
 }
