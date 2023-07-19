@@ -91,6 +91,7 @@ contract AppStoreNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enume
     constructor() {
         _disableInitializers();
     }
+
     function initialize(address devNFTAddress_, address dappNameListAddress_, address trustedForwarder_) initializer public {
         __ERC721_init("MerokuAppStore", "MerokuAppStore");
         __ERC721Enumerable_init();
