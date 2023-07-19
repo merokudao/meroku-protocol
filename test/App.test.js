@@ -38,9 +38,11 @@ describe(".app & .dev NFT minting", function () {
     await dappNameList.setDappNames(specialdAppNames);
     const DevNFT = await ethers.getContractFactory("DevNFTUpgradeable");
     const devNFT = await upgrades.deployProxy(DevNFT, [
+      dappNameList.address,
       process.env.TRUSTED_FORWARDER_ADDRESS,
     ]);
     await devNFT.deployed();
+    await devNFT.setPayForMintFlag(false);
     const appName = {
       owner: "ownerAppName",
       account1: "account1AppName",

@@ -76,7 +76,7 @@ module.exports = {
       gasMultiplier: 2,
     },
     mumbai: {
-      url: `https://matic-mumbai.chainstacklabs.com`,
+      url: `https://rpc.ankr.com/polygon_mumbai`,
       accounts: [process.env.PRIVATE_KEY], //add private key in this
       chainId: 80001,
       live: true,

@@ -30,6 +30,7 @@ describe(".appStore minting", function () {
     await dappNameList.setDappNames(specialdAppNames);
     const DevNFT = await ethers.getContractFactory("DevNFTUpgradeable");
     const devNFT = await upgrades.deployProxy(DevNFT, [
+      dappNameList.address,
       process.env.TRUSTED_FORWARDER_ADDRESS,
     ]);
     await devNFT.deployed();

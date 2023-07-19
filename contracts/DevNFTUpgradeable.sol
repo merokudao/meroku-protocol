@@ -3,7 +3,6 @@ pragma solidity ^0.8.9;
 
 import "./ERC721NameStorageUpgradeable.sol";
 
-
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721EnumerableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
@@ -16,6 +15,10 @@ import "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@opengsn/contracts/src/ERC2771Recipient.sol";
+
+interface IDappNameList {
+    function isAppNameAvailable(string memory appName) external view returns (bool);
+}
 
 /**
 *  @title DevNFT Upgradeable smart contract
@@ -32,7 +35,17 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
     event DevNameSet(address indexed owner, uint256 indexed tokenId, string devName, string uri);
     event UpdatedTokenURI(uint256 indexed tokenId, string uri);
 
-    uint128 public trading_fees;  // fees percentage in Gwei ex 2Gwei = 2%
+
+    // flag to prevent specific dev name length
+    bool public mintSpecialFlag;
+    // flag to prevent minting dev names from the whitelisted devs
+    bool public checkDappNamesListFlag;
+    // (Max)Length of special names
+    uint128 public constant SPL_MAX_LENGTH = 3;
+    IDappNameList public dappNameListAddress;
+
+    //string variable for storing the schema URI
+    string public schemaURI;
     uint128 public renew_fees;    // fees in wei
     uint128 public renew_life;    // timeperiod for which the dev name can be renewed by current owner
     uint128 public token_life;    // timeperiod for which the dev name is valid
@@ -42,15 +55,15 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
     // mapping for storing expiry timstamp of .dev NFTs
     mapping(uint256 => uint256) public expireOn;
 
-    //string variable for storing the schema URI
-    string public schemaURI;
-
+    uint128 public mint_fees;    // fees to mint a new dev name in wei
+    // flag to check if the minting is paid or not
+    bool public payForMintFlag;
 
     /// @custom:oz-upgrades-unsafe-allow constructor    
     constructor() {
         _disableInitializers();
     }
-    function initialize(address trustedForwarder_) initializer public {
+    function initialize(address dappNameListAddress_, address trustedForwarder_) initializer public {
         __ERC721_init("devNFT", "devNFT");
         __ERC721Enumerable_init();
         __ERC721URIStorage_init();
@@ -60,13 +73,20 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
         __UUPSUpgradeable_init();
         __ERC721NameStorage_init(".dev");
 
-        trading_fees = 2000000000; //2Gwei = 2%;
         renew_fees = 20000000000000000; //in wei
         token_life = 365 days;
         renew_life = 30 days;
+
+        dappNameListAddress = IDappNameList(dappNameListAddress_);
         _setTrustedForwarder(trustedForwarder_);
         _tokenIdCounter.increment();
+        checkDappNamesListFlag=true;
+        mint_fees = 1000000000000000000;
+        payForMintFlag = true;
+
+
     }
+
     /**
      * @dev Throws if token expired
      */
@@ -128,13 +148,24 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
      * @param uri the uri to set for the token
      * @param devName the name of dev to set for the token
      */
-    function safeMintDevNFT(address to, string memory uri, string calldata devName) external whenNotPaused {
+    function safeMintDevNFT(address to, string memory uri, string calldata devName) external payable whenNotPaused {
+        
+        if(payForMintFlag){
+            require(msg.value >= mint_fees, "Insufficient mint fee");
+        }
+        
         require(balanceOf(to)==0, "provided wallet already used to create dev");
         string memory validatedDevName = _validateName(devName);
+        if(checkDappNamesListFlag){
+            require(!dappNameListAddress.isAppNameAvailable(validatedDevName), "Dev name reserved");
+        }
+        if (bytes(validatedDevName).length <= SPL_MAX_LENGTH+suffixLength) {
+            require(mintSpecialFlag, "Minting of such names is restricted currently");
+        }
         mint(to, uri, validatedDevName);
     }
 
-        /**
+    /**
      * @notice renews a .dev NFT if its expired
      * @dev checks if tokenID is expired and renews it for 1 year if renew_fees is paid
      * @param _tokenID the tokenId of the NFT to renew
@@ -159,6 +190,33 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
         expireOn[_tokenID] = block.timestamp + token_life;
         _safeTransfer(_ownerOf(_tokenID), _msgSender(), _tokenID, "");
     }
+    /**
+     * @notice toggles the mintSpecialFlag by onlyOwner
+     * @dev this flag is used to check if the dev name's length is valid ie more than SPL_MAX_LENGTH
+     * @param _mintSpecialFlag bool value to set the flag
+     */
+    function setMintSpecialFlag(bool _mintSpecialFlag) external onlyOwner {
+        mintSpecialFlag = _mintSpecialFlag;
+    }
+
+    /**
+     * @notice toggles checkDappNamesListFlag by onlyOwner
+     * @dev this flag is used to check if the dev name is available in the dappNameList contract
+     * @param _checkDappNamesListFlag bool value to set the flag
+     */
+    function setCheckDappNamesListFlag(bool _checkDappNamesListFlag) external onlyOwner {
+        checkDappNamesListFlag = _checkDappNamesListFlag;
+    }
+
+    /**
+     * @notice toggles payForMintFlag by onlyOwner
+     * @dev this flag is used to check if the dev name mint is paid or not
+     * @param _payForMintFlag bool value to set the flag
+     */
+    function setPayForMintFlag(bool _payForMintFlag) external onlyOwner {
+        payForMintFlag = _payForMintFlag;
+    }
+
 
     /**
      * @notice set platform renew_fees for the sale of .dev NFT
@@ -170,12 +228,21 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
     }
 
     /**
+     * @notice set platform mint_fees for the mint of .dev NFT
+     * @dev this is the fees taken to mint a .dev NFT
+     * @param _new_mint_fees uint128 value which is fees in MATIC
+     */
+    function setMintFees(uint128 _new_mint_fees) external onlyOwner {
+        mint_fees = _new_mint_fees;
+    }
+
+    /**
      * @notice updates the tokenURI for the given token ID
      * @dev checks if caller is the owner/approved for tokenId and emits UpdatedTokenURI event with URI update
      * @param _tokenId uint256 token ID to update the URI for
      * @param _tokenURI string URI to set for the given token ID
      */
-    function updateTokenURI(uint256 _tokenId, string memory _tokenURI) external {
+    function updateTokenURI(uint256 _tokenId, string memory _tokenURI) external whenNotExpired(_tokenId) {
         require(_isApprovedOrOwner(_msgSender(), _tokenId), "ERC721: caller is not owner nor approved");
         _setTokenURI(_tokenId, _tokenURI);
         emit MetadataUpdate(_tokenId);
