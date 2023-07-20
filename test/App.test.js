@@ -30,6 +30,12 @@ describe(".app & .dev NFT minting", function () {
       account2: "account2DevName",
       otherAccount: "otherAccountDevName",
     };
+    const devNameLower = {
+      owner: "ownerdevname",
+      account1: "account1devname",
+      account2: "account2devname",
+      otherAccount: "otheraccountdevname",
+    };
     const dev_uri = ".devNFT.com";
     const specialdAppNames = ["uniswap.app", "curve.app", "sushiswap.app"];
     const DappNameList = await ethers.getContractFactory("dappNameList");
@@ -80,6 +86,7 @@ describe(".app & .dev NFT minting", function () {
       account2,
       otherAccount,
       devName,
+      devNameLower,
       appName,
       appNameLower,
       dev_uri,
@@ -246,6 +253,106 @@ describe(".app & .dev NFT minting", function () {
       });
     });
   });
+
+  describe("Transfer .devNFT", function () {
+    describe("Validations", function () {
+      it("Should revert with the right error if transferred to recipient who already owns .dev", async function () {
+        const { devNFT, account1, account2, otherAccount, devName, dev_uri, devNameLower } = await loadFixture(
+          deployNFTsFixture
+        );
+
+        await expect(
+          devNFT
+            .connect(account1)
+            .safeMintDevNFT(
+              account1.address,
+              devName.account1 + dev_uri,
+              devName.account1
+            )
+        ).not.to.be.reverted;
+
+        await expect(
+          devNFT
+            .connect(otherAccount)
+            .safeMintDevNFT(
+              otherAccount.address,
+              devName.otherAccount + dev_uri,
+              devName.otherAccount
+            )
+        ).not.to.be.reverted;
+
+        const tokenIDaccount1 = await devNFT.tokenIdForName(
+          `${devNameLower.account1}.dev`
+        );
+
+        const tokenIDotherAccount = await devNFT.tokenIdForName(
+          `${devNameLower.otherAccount}.dev`
+        );
+
+        await expect(
+          devNFT
+            .connect(account1)
+            .transferFrom(
+              account1.address,
+              otherAccount.address,
+              tokenIDaccount1
+            )
+        ).to.be.revertedWith("Recepient already owns a MerokuDev");
+
+        await expect(
+          devNFT
+            .connect(otherAccount)
+            .transferFrom(
+              otherAccount.address,
+              account2.address,
+              tokenIDotherAccount
+            )
+        ).not.to.be.reverted;
+
+        await expect(
+          devNFT
+            .connect(account1)
+            .transferFrom(
+              account1.address,
+              otherAccount.address,
+              tokenIDaccount1
+            )
+        ).not.to.be.reverted;
+      });
+
+      it("Should'nt fail when transferred to recipient who doesn't owns .dev", async function () {
+        const { devNFT, account1, otherAccount, devName, dev_uri, devNameLower } = await loadFixture(
+          deployNFTsFixture
+        );
+
+        await expect(
+          devNFT
+            .connect(account1)
+            .safeMintDevNFT(
+              account1.address,
+              devName.account1 + dev_uri,
+              devName.account1
+            )
+        ).not.to.be.reverted;
+
+        const tokenID = await devNFT.tokenIdForName(
+          `${devNameLower.account1}.dev`
+        );
+
+        await expect(
+          devNFT
+            .connect(account1)
+            .transferFrom(
+              account1.address,
+              otherAccount.address,
+              tokenID
+            )
+        ).not.to.be.reverted;
+
+        expect(await devNFT.ownerOf( tokenID )).to.equal(otherAccount.address);
+      });
+    })
+  })
 
   describe("Mint .appNFT", function () {
     describe("Validations", function () {

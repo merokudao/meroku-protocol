@@ -283,6 +283,7 @@ contract DevNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
         override(ERC721Upgradeable, ERC721EnumerableUpgradeable)
     {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
+        require(balanceOf(to)==0,"Recepient already owns a MerokuDev");
     }
 
     function _authorizeUpgrade(address newImplementation)
