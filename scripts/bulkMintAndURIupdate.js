@@ -4,6 +4,7 @@ const fs = require('fs');
 const config = require("./config.json");
 const contractAddress = config.AppNFTUpgradeable;
 
+
 const startIndex = 1;
 const endIndex = 3;
 
@@ -104,7 +105,6 @@ try{
         // console.log("dappId",dappId)
         // console.log("to",to)
         // console.log("tokenURI",tokenURI)
-
       }
 
       if(startIndex==0 && endIndex==0){
