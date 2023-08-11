@@ -49,7 +49,7 @@
   },
   "dependencies": {
     "@opengsn/contracts": "^3.0.0-beta.6",
-    "@openzeppelin/contracts": "^4.9.2",
+    "@openzeppelin/contracts": "^4.9.3",
     "@openzeppelin/contracts-upgradeable": "^4.9.2",
     "csv-parser": "^3.0.0",
     "dotenv": "^16.0.3",
