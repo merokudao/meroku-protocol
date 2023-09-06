@@ -35,3 +35,12 @@ jobs:
 
       - name: Run the script
         run: npm run whitelist mumbai
+        env:
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
+          ETHERSCAN_API_KEY: ${{ secrets.ETHERSCAN_API_KEY }}
+          POLYGONSCAN_API_KEY: ${{ secrets.POLYGONSCAN_API_KEY }}
+          COINMARKETCAP_API_KEY: ${{ secrets.COINMARKETCAP_API_KEY }}
+          TRUSTED_FORWARDER_ADDRESS: ${{ vars.TRUSTED_FORWARDER_ADDRESS }}
+          TRUSTED_FORWARDER_ADDRESS_POLYGON_MAINNET: ${{ vars.TRUSTED_FORWARDER_ADDRESS_POLYGON_MAINNET }}
+      
