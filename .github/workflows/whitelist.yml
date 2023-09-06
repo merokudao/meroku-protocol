@@ -41,6 +41,7 @@ jobs:
 
       - name: Process Newly Added Names
         run: |
+          CHANGES="${{ steps.git-diff.outputs.CHANGES }}"
           echo "Changes: $CHANGES"
           NEW_NAMES=$(echo "$CHANGES" | jq -Rs .)
           echo "Newly Added Names: $NEW_NAMES"
