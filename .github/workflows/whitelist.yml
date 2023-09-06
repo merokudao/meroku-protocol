@@ -1,0 +1,17 @@
+name: Call Function on App Name Change
+
+on:
+  push:
+    paths:
+      - 'scripts/list.json' 
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Run the script
+        run: npm run whitelist mumbai
