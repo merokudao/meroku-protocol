@@ -41,7 +41,7 @@ jobs:
 
       - name: Process Newly Added Names
         run: |
-          CHANGES="${{ steps.git-diff.GITHUB_STATE }}"
+          CHANGES="${{ steps.git-diff.$GITHUB_STATE }}"
           echo "Changes: $CHANGES"
           NEW_NAMES=$(echo "$CHANGES" | jq -Rs .)
           echo "Newly Added Names: $NEW_NAMES"
