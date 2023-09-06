@@ -43,7 +43,7 @@ jobs:
         run: |
           CHANGES="${{ steps.git-diff.outputs.changes }}"
           echo "Changes: $CHANGES"
-          NEW_NAMES=$(echo "$CHANGES" | jq -r '. | select(.+ and .[0] == "+") | .[1:]')
+          NEW_NAMES=$(echo "$CHANGES" | jq -Rs .)
           echo "Newly Added Names: $NEW_NAMES"
 
           npm run whitelist mumbai "$NEW_NAMES"
