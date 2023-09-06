@@ -25,6 +25,12 @@ async function main() {
 
   try {
 
+    const args = process.argv.slice(2);
+
+// Process the newly added names
+console.log("Newly Added Names:", args);
+
+
 
       let startIndex = index.list;
       let stopIndex = listName.names.length;

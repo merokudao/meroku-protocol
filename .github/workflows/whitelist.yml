@@ -32,9 +32,21 @@ jobs:
           TRUSTED_FORWARDER_ADDRESS: ${{ vars.TRUSTED_FORWARDER_ADDRESS }}
           TRUSTED_FORWARDER_ADDRESS_POLYGON_MAINNET: ${{ vars.TRUSTED_FORWARDER_ADDRESS_POLYGON_MAINNET }}
       
+      
+      - name: Determine changes in list
+        id: git-diff
+        run: |
+          CHANGES=$(git diff --unified=0 HEAD~1 HEAD scripts/list.json)
+          echo "::set-output name=changes::$CHANGES"
 
-      - name: Run the script
-        run: npm run whitelist mumbai
+      - name: Process Newly Added Names
+        run: |
+          CHANGES="${{ steps.git-diff.outputs.changes }}"
+          echo "Changes: $CHANGES"
+          NEW_NAMES=$(echo "$CHANGES" | jq -r '. | select(.+ and .[0] == "+") | .[1:]')
+          echo "Newly Added Names: $NEW_NAMES"
+
+          npm run whitelist mumbai "$NEW_NAMES"
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
