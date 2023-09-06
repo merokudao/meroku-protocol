@@ -37,11 +37,10 @@ jobs:
         id: git-diff
         run: |
           CHANGES=$(git diff --unified=0 staging -- scripts/list.json)
-          echo "{changes}={CHANGES}" >> $GITHUB_STATE
+          echo "CHANGES=${CHANGES}" >> $GITHUB_ENV
 
       - name: Process Newly Added Names
         run: |
-          CHANGES="${{ steps.git-diff.GITHUB_STATE }}"
           echo "Changes: $CHANGES"
           NEW_NAMES=$(echo "$CHANGES" | jq -Rs .)
           echo "Newly Added Names: $NEW_NAMES"
