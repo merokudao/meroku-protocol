@@ -3,7 +3,9 @@ name: Call Function on App Name Change
 on:
   push:
     paths:
-      - 'scripts/list.json' 
+      - 'scripts/reservedAppStoreNames.json' 
+      - 'scripts/reservedDappNames.json' 
+      - 'scripts/reservedDevNames.json' 
 
 jobs:
   build:
@@ -32,21 +34,8 @@ jobs:
           TRUSTED_FORWARDER_ADDRESS: ${{ vars.TRUSTED_FORWARDER_ADDRESS }}
           TRUSTED_FORWARDER_ADDRESS_POLYGON_MAINNET: ${{ vars.TRUSTED_FORWARDER_ADDRESS_POLYGON_MAINNET }}
       
-      
-      - name: Determine changes in list
-        id: git-diff
-        run: |
-          CHANGES=$(git diff --unified=0 staging -- scripts/list.json)
-          echo "CHANGES=${CHANGES}" >> $GITHUB_ENV
-
       - name: Process Newly Added Names
-        run: |
-          CHANGES="${{ steps.git-diff.outputs.CHANGES }}"
-          echo "Changes: $CHANGES"
-          NEW_NAMES=$(echo "$CHANGES" | jq -Rs .)
-          echo "Newly Added Names: $NEW_NAMES"
-
-          npm run whitelist mumbai "$NEW_NAMES"
+        run:  npm run whitelist mumbai
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
