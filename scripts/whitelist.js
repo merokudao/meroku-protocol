@@ -43,12 +43,12 @@ async function main() {
   console.log("signer: ", signer.address);
 
   let listNameList = [];
-  
+
   // fetching dapp names
   if(dappNameList.whitelisted != dappNameList.names.length){
     console.log("fetching newly added dapp names");
     const list = dappNameList.names.slice(dappNameList.whitelisted, dappNameList.names.length);
-    console.log("list: ", list);
+    console.log("list: ", list[0], "to: ", list[list.length-1]);
     listNameList.push(...list)
   }
 
@@ -56,7 +56,7 @@ async function main() {
   if(devNameList.whitelisted != devNameList.names.length){
     console.log("fetching newly added dev names");
     const list = devNameList.names.slice(devNameList.whitelisted, devNameList.names.length);
-    console.log("list: ", list);
+    console.log("list: ", list[0], "to: ", list[list.length-1]);
     listNameList.push(...list)
   }
 
@@ -64,7 +64,7 @@ async function main() {
   if(appStoreNameList.whitelisted != appStoreNameList.names.length){
     console.log("fetching newly added appStore names");
     const list = appStoreNameList.names.slice(appStoreNameList.whitelisted, appStoreNameList.names.length);
-    console.log("list: ", list);
+    console.log("list: ", list[0], "to: ", list[list.length-1]);
     listNameList.push(...list)
   }
 
