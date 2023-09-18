@@ -42,7 +42,8 @@ async function main() {
   const signer = await ethers.getSigner();
   console.log("signer: ", signer.address);
 
-  let listNameList = []
+  let listNameList = [];
+  
   // fetching dapp names
   if(dappNameList.whitelisted != dappNameList.names.length){
     console.log("fetching newly added dapp names");
