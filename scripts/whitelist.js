@@ -70,6 +70,10 @@ async function main() {
 
   // console.log("listNameList: ", listNameList);
 
+  if(listNameList.length == 0){
+    console.log("no new names to add");
+    return;
+  }
   await whitelist(listNameList, 0, listNameList.length);
 
 }
