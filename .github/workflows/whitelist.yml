@@ -35,7 +35,7 @@ jobs:
           TRUSTED_FORWARDER_ADDRESS_POLYGON_MAINNET: ${{ vars.TRUSTED_FORWARDER_ADDRESS_POLYGON_MAINNET }}
       
       - name: Process Newly Added Names
-        run:  npm run whitelist mumbai
+        run:  npm run whitelist polygon
         env:
           PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
           ALCHEMY_API_KEY: ${{ secrets.ALCHEMY_API_KEY }}
