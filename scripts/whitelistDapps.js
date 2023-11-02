@@ -1,8 +1,17 @@
 const fs = require('fs');
 const { google } = require('googleapis');
-require('dotenv').config();
+const dotenv = require('dotenv')
 
-// Function to read a JSON file
+dotenv.config()
+const google_key = process.env.GOOGLE_PRIVATE_KEY.split(String.raw`\n`).join(
+  "\n"
+);
+
+/**
+ * Reads a JSON file and returns its contents as a JavaScript object.
+ * @param {string} filename - The path of the JSON file to be read.
+ * @returns {Object|null} - The contents of the JSON file as a JavaScript object, or null if an error occurred.
+ */
 function readJSONFile(filename) {
   try {
     const data = fs.readFileSync(filename, 'utf8');
@@ -13,23 +22,32 @@ function readJSONFile(filename) {
   }
 }
 
-// Function to write a JSON file
+/**
+ * Writes data to a JSON file.
+ * @param {string} filename - The name of the file to write to.
+ * @param {object} data - The data to write to the file.
+ */
 function writeJSONFile(filename, data) {
   try {
-    const jsonData = JSON.stringify(data, null, 2) + '\n'; // Add a newline character
+    const jsonData = JSON.stringify(data, null, 2) + '\n';
     fs.writeFileSync(filename, jsonData);
   } catch (error) {
     console.error(`Error writing ${filename}: ${error.message}`);
   }
 }
 
-// Fetch data from Google Sheet
+/**
+ * Fetches Dapp IDs from a Google Sheet and updates reserved Dapp names.
+ * @async
+ * @function fetchDappIDsFromGoogleSheet
+ * @returns 
+ */
 const fetchDappIDsFromGoogleSheet = async () => {
     console.log(process.env.GOOGLE_CLIENT_EMAIL)
   const jwtClient = new google.auth.JWT(
     process.env.GOOGLE_CLIENT_EMAIL,
     undefined,
-    process.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+    google_key,
     ['https://www.googleapis.com/auth/spreadsheets']
   );
 
@@ -57,7 +75,10 @@ const fetchDappIDsFromGoogleSheet = async () => {
   });
 };
 
-// Update reservedDappNames.json with new dappIDs
+/**
+ * Updates the reserved Dapp names with new Dapp IDs.
+ * @param {Array<string>} newDappIDs - An array of new Dapp IDs to be added to the reserved Dapp names.
+ */
 const updateReservedDappNames = (newDappIDs) => {
   const reservedDappNames = readJSONFile('reservedDappNames.json');
 
