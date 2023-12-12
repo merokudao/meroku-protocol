@@ -1,5 +1,5 @@
 {
-  "whitelisted": 4596,
+  "whitelisted": 4599,
   "names": [
     "cryptokitties.app",
     "larvalabs.app",
@@ -4596,6 +4596,9 @@
     "huggingface.app",
     "bitcoinshrooms.app",
     "aburra.app",
-    "supercast.app"
+    "supercast.app",
+    "openzepplin.app",
+    "bittensor.app",
+    "seam.app"
   ]
 }
