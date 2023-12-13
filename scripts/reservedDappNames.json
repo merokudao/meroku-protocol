@@ -1,5 +1,5 @@
 {
-  "whitelisted": 4610,
+  "whitelisted": 4618,
   "names": [
     "cryptokitties.app",
     "larvalabs.app",
@@ -4610,6 +4610,14 @@
     "rootstock.app",
     "gfxlabs.app",
     "futureverse.app",
-    "relevanceai.app"
+    "relevanceai.app",
+    "reworkd.app",
+    "audiobox.app",
+    "diplop.app",
+    "aiagent.app",
+    "oasys.app",
+    "beatport.app",
+    "sonorusnetwork.app",
+    "klubcoin.app"
   ]
 }
