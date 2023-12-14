@@ -1,5 +1,5 @@
 {
-  "whitelisted": 4618,
+  "whitelisted": 4628,
   "names": [
     "cryptokitties.app",
     "larvalabs.app",
@@ -4618,6 +4618,16 @@
     "oasys.app",
     "beatport.app",
     "sonorusnetwork.app",
-    "klubcoin.app"
+    "klubcoin.app",
+    "ssvnetwork.app",
+    "brawlers.app",
+    "kaikai.app",
+    "chainlight.app",
+    "matter-labs.app",
+    "nilfoundation.app",
+    "bluewillow.app",
+    "github-copilot.app",
+    "microsoft-copilot.app",
+    "provinciastudio.app"
   ]
 }
