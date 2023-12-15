@@ -1,5 +1,5 @@
 {
-  "whitelisted": 4631,
+  "whitelisted": 4635,
   "names": [
     "cryptokitties.app",
     "larvalabs.app",
@@ -4631,6 +4631,10 @@
     "provinciastudio.app",
     "concordium.app",
     "dcent.app",
-    "mistral-ai.app"
+    "mistral-ai.app",
+    "kongregate.app",
+    "proofofhumanity.app",
+    "brightid.app",
+    "google-ai-studio.app"
   ]
 }
