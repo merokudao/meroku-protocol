@@ -1,5 +1,5 @@
 {
-  "whitelisted": 4635,
+  "whitelisted": 4642,
   "names": [
     "cryptokitties.app",
     "larvalabs.app",
@@ -4635,6 +4635,13 @@
     "kongregate.app",
     "proofofhumanity.app",
     "brightid.app",
-    "google-ai-studio.app"
+    "google-ai-studio.app",
+    "nodle.app",
+    "nodle-cash.app",
+    "click-camera.app",
+    "liquid-collective.app",
+    "champions-arena.app",
+    "chronos-worlds.app",
+    "polemos.app"
   ]
 }
