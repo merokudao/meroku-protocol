@@ -1,5 +1,5 @@
 {
-  "whitelisted": 4651,
+  "whitelisted": 4653,
   "names": [
     "cryptokitties.app",
     "larvalabs.app",
@@ -4651,6 +4651,8 @@
     "jagat.app",
     "propchain.app",
     "tokenfi.app",
-    "atomicals.app"
+    "atomicals.app",
+    "smartcredit.app",
+    "chainaware.app"
   ]
 }
