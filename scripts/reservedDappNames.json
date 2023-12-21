@@ -1,5 +1,5 @@
 {
-  "whitelisted": 4663,
+  "whitelisted": 4669,
   "names": [
     "cryptokitties.app",
     "larvalabs.app",
@@ -4663,6 +4663,12 @@
     "samoyed-coin.app",
     "coordinape.app",
     "nodekit.app",
-    "ordinalhub.app"
+    "ordinalhub.app",
+    "metaplex.app",
+    "benddao.app",
+    "nfprompt.app",
+    "appomni.app",
+    "sprinto.app",
+    "torii.app"
   ]
 }
