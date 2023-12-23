@@ -1,5 +1,5 @@
 {
-  "whitelisted": 4669,
+  "whitelisted": 4671,
   "names": [
     "cryptokitties.app",
     "larvalabs.app",
@@ -4669,6 +4669,8 @@
     "nfprompt.app",
     "appomni.app",
     "sprinto.app",
-    "torii.app"
+    "torii.app",
+    "starry-ai.app",
+    "riffusion.app"
   ]
 }
