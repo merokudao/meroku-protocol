@@ -433,15 +433,15 @@ contract AppNFTUpgradeable is Initializable, ERC721Upgradeable, ERC721Enumerable
     /**
     * @dev Mint multiple NFTs and assign them to a specified address.
     * @param to The address to assign the minted NFTs to.
-    * @param appNames An array of app names to use for the NFTs.
+    * @param names An array of names to use for the NFTs.
     * @param uris An array of URIs to use for the NFTs.
     */
-    function bulkMintAndURIupdate(address[] calldata to, uint256[] calldata tokenIds, string[] calldata appNames, string[] calldata uris) external onlyOwner {
-        uint256 quantity = appNames.length;
-        require(quantity == uris.length, "appNames and uris length mismatch");
-        for (uint256 i = 0; i < appNames.length; i++) {
+    function bulkMintAndURIupdate(address[] calldata to, uint256[] calldata tokenIds, string[] calldata names, string[] calldata uris) external onlyOwner {
+        uint256 quantity = tokenIds.length;
+        require(quantity == uris.length, "tokenIds and uris length mismatch");
+        for (uint256 i = 0; i < tokenIds.length; i++) {
             if(tokenIds[i] == 0){
-                mint(to[i], uris[i], appNames[i]);
+                mint(to[i], uris[i], names[i]);
             } else {
                 _setTokenURI(tokenIds[i], uris[i]);
             }
